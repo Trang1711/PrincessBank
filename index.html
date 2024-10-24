@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Princess Bank</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("pic/bgg.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0c4c7a;
+            margin-bottom: 40px;
+            font-size: 28px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #B8E1FF;
+            border-radius: 8px;
+        }
+
+        .form-section button {
+            width: 100%;
+            padding: 12px;
+            background-color: #B8E1FF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-section button:hover {
+            background-color: #2086cf;
+        }
+
+        .nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .nav button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #3793d1;
+            border: 1px solid #7ac6f9;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .nav button i {
+            font-size: 40px;
+            color: #0f6cae;
+            margin-bottom: 10px;
+        }
+
+        .nav button:hover {
+            background-color: #B8E1FF;
+        }
+
+        .footer-icons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .footer-icons img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 100px;
+            height: auto;
+        }
+
+        .balance-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .balance {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .eye-icon {
+            font-size: 28px;
+            cursor: pointer;
+            color: #B8E1FF;
+        }
+
+        .eye-icon:hover {
+            color: #B8E1FF;
+        }
+
+        /* Giao diện hộp thoại giao dịch */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal-content input {
+            margin-bottom: 10px;
+            width: calc(100% - 24px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #CED1E6;
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            background-color: #011F82;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #B8E1FF;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Princess Bank</h1>
+
+        <!-- Phần Đăng Ký -->
+        <div id="register" class="form-section active">
+            <h2>Đăng Ký</h2>
+            <form onsubmit="event.preventDefault(); registerUser();">
+                <input type="text" id="reg-username" placeholder="Tên đăng nhập" required>
+                <input type="text" id="reg-cccd" placeholder="CCCD" required>
+                <input type="text" id="reg-phone" placeholder="Số điện thoại" required>
+                <input type="text" id="reg-address" placeholder="Địa chỉ" required>
+                <input type="password" id="reg-password" placeholder="Mật khẩu" required>
+                <button type="submit">Đăng Ký</button>
+                <p>Đã có tài khoản? <a href="#" onclick="toggleForms()">Đăng Nhập</a></p>
+            </form>
+        </div>
+
+        <!-- Phần Đăng Nhập -->
+        <div id="login" class="form-section">
+            <h2>Đăng Nhập</h2>
+            <form onsubmit="event.preventDefault(); showAccount();">
+                <input type="text" id="username" placeholder="Tên đăng nhập hoặc số điện thoại" required>
+                <input type="password" id="password" placeholder="Mật khẩu" required>
+                <button type="submit">Đăng Nhập</button>
+                <p>Chưa có tài khoản? <a href="#" onclick="toggleForms()">Đăng Ký</a></p>
+            </form>
+        </div>
+
+        <!-- Phần Tài Khoản -->
+        <div id="account" class="form-section">
+            <h2>Tài Khoản Của Bạn</h2>
+            <p id="greeting">Xin chào, [Tên người dùng]</p>
+
+            <div class="balance-container">
+                <p>Số dư tài khoản:</p>
+                <div>
+                    <span id="balance" class="balance">********</span>
+                    <i id="eye-icon" class="material-icons eye-icon" onclick="toggleBalance()">visibility</i>
+                </div>
+            </div>
+
+            <div class="nav">
+                <button onclick="openModal('withdraw')">
+                    <i class="material-icons">money</i>
+                    Rút tiền
+                </button>
+                <button onclick="openModal('transfer')">
+                    <i class="material-icons">swap_horiz</i>
+                    Chuyển tiền
+                </button>
+                <button onclick="openModal('payDebt')">
+                    <i class="material-icons">account_balance_wallet</i>
+                    Thanh toán nợ ngân hàng
+                </button>
+                <button onclick="openModal('payCredit')">
+                    <i class="material-icons">credit_card</i>
+                    Thanh toán tín dụng
+                </button>
+                <button onclick="openModal('precharge')">
+                    <i class="material-icons">attach_money</i>
+                    Nạp tiền
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Modal cho giao dịch -->
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modal-content">
+            <span onclick="closeModal()" style="cursor:pointer; float:right;">&times;</span>
+            <h2 id="modal-title">Giao Dịch</h2>
+            <p id="modal-description"></p>
+            <form id="modal-form" onsubmit="event.preventDefault(); handleTransaction();">
+                <input type="text" id="modal-input" placeholder="" required>
+                <button type="submit">Xác Nhận</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let isBalanceVisible = false;
+        let balanceAmount = 1000000000; // Số dư tài khoản mặc định
+        const creditDebtAmount = 2000000; // Số tiền nợ tín dụng mặc định
+
+        function showAccount() {
+            const username = document.getElementById('username').value;
+            document.getElementById('greeting').innerText = `Xin chào, ${username}`;
+            document.getElementById('login').classList.remove('active');
+            document.getElementById('account').classList.add('active');
+            document.getElementById('balance').innerText = balanceAmount.toLocaleString() + ' VND';
+        }
+
+        function toggleForms() {
+            const registerForm = document.getElementById('register');
+            const loginForm = document.getElementById('login');
+            registerForm.classList.toggle('active');
+            loginForm.classList.toggle('active');
+        }
+
+        function toggleBalance() {
+            isBalanceVisible = !isBalanceVisible;
+            document.getElementById('balance').innerText = isBalanceVisible ? balanceAmount.toLocaleString() + ' VND' : '***';
+            document.getElementById('eye-icon').innerText = isBalanceVisible ? 'visibility_off' : 'visibility';
+        }
+
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalInput = document.getElementById('modal-input');
+            const modalDescription = document.getElementById('modal-description');
+
+            modal.style.display = 'flex';
+            modalInput.value = '';
+            modalInput.placeholder = 'Nhập số tiền';
+
+            switch (type) {
+                case 'withdraw':
+                    modalTitle.innerText = 'Rút tiền';
+                    modalDescription.innerText = 'Nhập số tiền bạn muốn rút:';
+                    break;
+                case 'transfer':
+                    modalTitle.innerText = 'Chuyển tiền';
+                    modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
+                    break;
+                case 'payDebt':
+                    modalTitle.innerText = 'Thanh toán nợ';
+                    modalDescription.innerText = `Nhập số tiền bạn muốn thanh toán. Số nợ hiện tại: ${creditDebtAmount.toLocaleString()} VND`;
+                    break;
+                case 'payCredit':
+                    modalTitle.innerText = 'Thanh toán tín dụng';
+                    modalDescription.innerText = 'Nhập số tiền bạn muốn thanh toán tín dụng:';
+                    break;
+                case 'precharge':   
+                    modalTitle.innerText = 'Nạp tiền ';
+                    modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển vào tài khoản:';
+                    break;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function handleTransaction() {
+    const inputAmount = parseFloat(document.getElementById('modal-input').value);
+    if (isNaN(inputAmount) || inputAmount <= 0) {
+        alert('Số tiền không hợp lệ.');
+        return;
+    }
+
+    const modalTitle = document.getElementById('modal-title').innerText;
+
+    switch (modalTitle) {
+        case 'Rút tiền':
+            if (inputAmount > balanceAmount) {
+                alert('Số dư không đủ để rút số tiền này.');
+            } else {
+                balanceAmount -= inputAmount;
+                alert(`Bạn đã rút ${inputAmount.toLocaleString()} VND.`);
+                updateBalanceDisplay();
+            }
+            break;
+
+        case 'Chuyển tiền':
+            if (inputAmount > balanceAmount) {
+                alert('Số dư không đủ để chuyển số tiền này.');
+            } else {
+                balanceAmount -= inputAmount;
+                alert(`Bạn đã chuyển ${inputAmount.toLocaleString()} VND.`);
+                updateBalanceDisplay();
+            }
+            break;
+
+        case 'Thanh toán nợ':
+            if (inputAmount > creditDebtAmount) {
+                alert('Số tiền thanh toán không thể lớn hơn số nợ hiện tại.');
+            } else {
+                creditDebtAmount -= inputAmount; // Giảm số nợ
+                alert(`Bạn đã thanh toán nợ ${inputAmount.toLocaleString()} VND.`);
+            }
+            break;
+
+        case 'Thanh toán tín dụng':
+            // Logic for credit payment (if applicable)
+            alert(`Bạn đã thanh toán tín dụng ${inputAmount.toLocaleString()} VND.`);
+            break;
+
+        case 'Nạp tiền':
+            balanceAmount += inputAmount; // Tăng số dư
+            alert(`Bạn đã nạp ${inputAmount.toLocaleString()} VND.`);
+            updateBalanceDisplay();
+            break;
+    }
+
+    closeModal(); // Đóng modal sau khi hoàn tất giao dịch
+}
+
+function updateBalanceDisplay() {
+    document.getElementById('balance').innerText = balanceAmount.toLocaleString() + ' VND';
+}
+
+        function registerUser() {
+            const username = document.getElementById('reg-username').value;
+            const cccd = document.getElementById('reg-cccd').value;
+            const phone = document.getElementById('reg-phone').value;
+            const address = document.getElementById('reg-address').value;
+            const password = document.getElementById('reg-password').value;
+
+            // Tại đây, bạn sẽ xử lý logic đăng ký, chẳng hạn như gửi dữ liệu đến máy chủ
+            alert(`Đăng ký thành công cho ${username}!`);
+            toggleForms(); // Tự động chuyển đến biểu mẫu đăng nhập sau khi đăng ký
+        }
+    </script>
+
+</body>
+</html>
