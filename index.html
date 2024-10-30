@@ -472,10 +472,12 @@ function showTransactionHistory() {
         amount: inputAmount,
         time: getFormattedDate()
     });
-
+       // Hiển thị hóa đơn sau mỗi giao dịch
+       generateInvoice(transactionType, inputAmount);
     updateBalanceDisplay();
     closeModal();
-}
+
+        }
         let invoiceCounter = 1; // Khởi tạo bộ đếm số hóa đơn
 
 function getFormattedDate() {
@@ -483,21 +485,20 @@ function getFormattedDate() {
     return `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 }
 
-function generateInvoice(transactionType, amount, accountNumber = '') {
+function generateInvoice(transactionType, amount) {
     const transactionTime = new Date().toLocaleString();
-    const invoiceNumber = 'HD' + Math.floor(Math.random() * 1000000); // Generate random invoice number
+    const invoiceNumber = 'HD' + Math.floor(Math.random() * 1000000);
 
+    // Tạo chi tiết hóa đơn
     let invoiceDetails = `Hóa Đơn: ${invoiceNumber}\n`;
     invoiceDetails += `Loại giao dịch: ${transactionType}\n`;
     invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
     invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
 
-    if (transactionType === 'Chuyển tiền' && accountNumber) {
-        invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
-    }
-
-    alert(invoiceDetails); // Display or log the invoice
+    // Hiển thị hóa đơn
+    alert(invoiceDetails); // Hiển thị hóa đơn qua alert
 }
+
 
 function showInvoice(type, amount) {
         const invoiceSection = document.getElementById('invoice-section');
