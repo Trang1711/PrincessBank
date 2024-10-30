@@ -75,3 +75,86 @@ button:hover {
 .back-button:hover, .redo-button:hover {
     background-color: #0056b3;
 }
+/* Basic styling for invoice modal */
+.invoice-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.invoice-content {
+    background: #fef5f5;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.invoice-content h2 {
+    color: #ff7f7f;
+    margin-bottom: 10px;
+}
+
+.invoice-content p {
+    font-size: 14px;
+    margin: 8px 0;
+}
+
+.invoice-content .close-btn {
+    background: #ff7f7f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.3s ease;
+}
+
+.invoice-content .close-btn:hover {
+    background: #ff5050;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #ffffff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #ddd;
+  }
+  

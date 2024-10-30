@@ -186,6 +186,54 @@
         .modal-content button:hover {
             background-color: #B8E1FF;
         }
+
+          /* Avatar and Dropdown */
+          .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            background-image: url('avatar.jpg'); /* Replace with user avatar */
+            background-size: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            min-width: 150px;
+            z-index: 10;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -228,6 +276,17 @@
                 <div>
                     <span id="balance" class="balance">********</span>
                     <i id="eye-icon" class="material-icons eye-icon" onclick="toggleBalance()">visibility</i>
+                </div>
+                <div class="profile-container">
+                    <!-- Avatar -->
+                    <div class="avatar" onclick="toggleDropdown()"></div>
+            
+                    <!-- Dropdown Menu -->
+                    <div id="dropdown" class="dropdown-menu">
+                        <a href="#">Thông tin cá nhân</a>
+                        <a href="#">Đổi mật khẩu</a>
+                        <a href="#">Đăng xuất</a>
+                    </div>
                 </div>
             </div>
 
@@ -275,9 +334,26 @@
         </div>
     </div>
     
+
     
     
     <script>
+
+        // Toggle dropdown menu
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Hide dropdown if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.avatar')) {
+                const dropdown = document.getElementById('dropdown');
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';
+                }
+            }
+        }
         let transactionHistory = []; // Mảng để lưu lịch sử giao dịch
 
        let isBalanceVisible = false;
@@ -286,6 +362,12 @@
 
         let stateStack = []; // Stack để lưu trữ trạng thái trước khi thực hiện thao tác
         let redoStack = []; // Stack cho redo
+        let incorrectPasswordAttempts = 0; // Counter for incorrect password attempts
+        const MAX_ATTEMPTS = 3; // Maximum allowed attempts before account lock
+        let isAccountLocked = false; // Flag to check if account is locked
+
+        const correctPassword = "your_password"; // Replace with actual password for checking
+
 
 // Hàm lưu trạng thái hiện tại trước khi thực hiện giao dịch mới
         function saveState() {
@@ -338,6 +420,22 @@ function updateBalanceDisplay() {
     document.getElementById('balance').innerText = isBalanceVisible ? balanceAmount.toLocaleString() : '********';
 }
 
+        function registerUser() {
+            const username = document.getElementById('reg-username').value;
+            const cccd = document.getElementById('reg-cccd').value;
+            const phone = document.getElementById('reg-phone').value;
+            const address = document.getElementById('reg-address').value;
+            const password = document.getElementById('reg-password').value;
+            
+            if (username && cccd && phone && address && password) {
+                alert("Đăng ký thành công! Bạn sẽ được chuyển đến trang đăng nhập.");
+                
+                // Chuyển sang form đăng nhập
+                toggleForms();
+            } else {
+                alert("Vui lòng điền đầy đủ thông tin.");
+            }
+        }
 
         function showAccount() {
             const username = document.getElementById('username').value;
@@ -392,31 +490,43 @@ function updateBalanceDisplay() {
                     modalTitle.innerText = 'Nạp tiền ';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển vào tài khoản:';
                     break;
+                  
             }
         }
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
         }
+
         // Hàm hiển thị sao kê
-function showTransactionHistory() {
-    const transactionList = document.getElementById('transaction-list');
-    transactionList.innerHTML = '';
+        function showTransactionHistory() {
+            const transactionList = document.getElementById('transaction-list');
+            transactionList.innerHTML = '';
 
-    transactionHistory.forEach(transaction => {
-        const listItem = document.createElement('li');
-        listItem.innerText = `${transaction.time}: ${transaction.type} - ${transaction.amount.toLocaleString()} VND`;
-        transactionList.appendChild(listItem);
-    });
+            transactionHistory.forEach(transaction => {
+                const listItem = document.createElement('li');
+                listItem.innerText = `${transaction.time}: ${transaction.type} - ${transaction.amount.toLocaleString()} VND`;
+                transactionList.appendChild(listItem);
+            });
 
-    document.getElementById('transaction-history').style.display = 'block';
-}
-        function handleTransaction() {
+                document.getElementById('transaction-history').style.display = 'block';
+            }
+
+            let password = "123"; // Nhập đúng mật khẩu 
+            let failedAttempts = 0; // Đếm số lần nhập sai mật khẩu
+
+            function handleTransaction() {
+                    if (!promptPassword()) {
+                alert("Giao dịch bị hủy do nhập sai mật khẩu quá 3 lần.");
+                return; // Hủy giao dịch nếu sai mật khẩu 3 lần
+            }
+
             const inputAmount = parseFloat(document.getElementById('modal-input').value);
             if (isNaN(inputAmount) || inputAmount <= 0) {
                 alert('Số tiền không hợp lệ.');
                 return;
-            }
+    }
+
 
             saveState(); // Lưu trạng thái trước khi thực hiện giao dịch
             const modalTitle = document.getElementById('modal-title').innerText;
@@ -473,11 +583,30 @@ function showTransactionHistory() {
         time: getFormattedDate()
     });
        // Hiển thị hóa đơn sau mỗi giao dịch
-       generateInvoice(transactionType, inputAmount);
-    updateBalanceDisplay();
-    closeModal();
-
+        generateInvoice(transactionType, inputAmount);
+        updateBalanceDisplay();
+        closeModal();
         }
+    // khóa mk
+    function promptPassword() {
+    for (let i = 0; i < 3; i++) {
+        const inputPassword = prompt("Nhập mật khẩu của bạn:");
+        if (verifyPassword(inputPassword)) {
+            return true; // Nếu mật khẩu đúng, tiếp tục giao dịch
+        } else {
+            alert("Mật khẩu không chính xác.");
+            failedAttempts++;
+            if (failedAttempts >= 3) {
+                return false; // Nếu sai 3 lần, hủy giao dịch
+            }
+        }
+    }
+    return false;
+}
+
+function verifyPassword(inputPassword) {
+    return inputPassword === password;
+}
         let invoiceCounter = 1; // Khởi tạo bộ đếm số hóa đơn
 
 function getFormattedDate() {
@@ -564,9 +693,7 @@ function showInvoice(type, amount) {
     }
 
     alert(historyContent);
-}
-
-
+} 
 
     </script>
 </body>
