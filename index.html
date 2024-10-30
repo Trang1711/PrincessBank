@@ -177,7 +177,7 @@
             width: 100%;
             padding: 10px;
             background-color: #011F82;
-            color: white;
+            color: #B8E1FF;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -231,27 +231,17 @@
                 </div>
             </div>
 
+            <div class="back-button-container">
+                <button class="back-button" onclick="undoAction()">Undo</button>
+                <button class="redo-button" onclick="redoAction()">Redo</button>
+            </div>
+
             <div class="nav">
-                <button onclick="openModal('withdraw')">
-                    <i class="material-icons">money</i>
-                    Rút tiền
-                </button>
-                <button onclick="openModal('transfer')">
-                    <i class="material-icons">swap_horiz</i>
-                    Chuyển tiền
-                </button>
-                <button onclick="openModal('payDebt')">
-                    <i class="material-icons">account_balance_wallet</i>
-                    Thanh toán nợ ngân hàng
-                </button>
-                <button onclick="openModal('payCredit')">
-                    <i class="material-icons">credit_card</i>
-                    Thanh toán tín dụng
-                </button>
-                <button onclick="openModal('precharge')">
-                    <i class="material-icons">attach_money</i>
-                    Nạp tiền
-                </button>
+                <button onclick="openModal('withdraw')">Rút tiền</button>
+                <button onclick="openModal('transfer')">Chuyển tiền</button>
+                <button onclick="openModal('payDebt')">Sao kê</button>
+                <button onclick="openModal('payCredit')">Thanh toán tín dụng</button>
+                <button onclick="openModal('precharge')">Nạp tiền</button>
             </div>
             
         </div>
@@ -270,17 +260,91 @@
         </div>
     </div>
 
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-description"></p>
+            <input type="text" id="modal-input" placeholder="Nhập số tiền">
+            <button onclick="handleTransaction()">Xác nhận</button>
+            <button onclick="closeModal()">Đóng</button>
+            <!-- Phần tử cho hóa đơn -->
+            <div id="invoice-section" style="display: none;">
+                <h3>Hóa Đơn</h3>
+                <pre id="invoice-details"></pre>
+            </div>
+        </div>
+    </div>
+    
+    
+    
     <script>
-        let isBalanceVisible = false;
+        let transactionHistory = []; // Mảng để lưu lịch sử giao dịch
+
+       let isBalanceVisible = false;
         let balanceAmount = 1000000000; // Số dư tài khoản mặc định
         const creditDebtAmount = 2000000; // Số tiền nợ tín dụng mặc định
+
+        let stateStack = []; // Stack để lưu trữ trạng thái trước khi thực hiện thao tác
+        let redoStack = []; // Stack cho redo
+
+// Hàm lưu trạng thái hiện tại trước khi thực hiện giao dịch mới
+        function saveState() {
+            stateStack.push({
+                balanceAmount: balanceAmount,
+                creditDebtAmount: creditDebtAmount,
+                isBalanceVisible: isBalanceVisible
+            });
+            redoStack = []; // Reset redo stack khi có thao tác mới
+        }
+
+// Hàm Undo - quay lại trạng thái trước đó
+function undoAction() {
+    if (stateStack.length > 0) {
+        redoStack.push({
+            balanceAmount: balanceAmount,
+            creditDebtAmount: creditDebtAmount,
+            isBalanceVisible: isBalanceVisible
+        });
+        const lastState = stateStack.pop();
+        balanceAmount = lastState.balanceAmount;
+        creditDebtAmount = lastState.creditDebtAmount;
+        isBalanceVisible = lastState.isBalanceVisible;
+        updateBalanceDisplay();
+    } else {
+        alert("Không có thao tác nào để hoàn tác.");
+    }
+}
+
+// Hàm Redo - lặp lại trạng thái sau khi đã Undo
+function redoAction() {
+    if (redoStack.length > 0) {
+        stateStack.push({
+            balanceAmount: balanceAmount,
+            creditDebtAmount: creditDebtAmount,
+            isBalanceVisible: isBalanceVisible
+        });
+        const nextState = redoStack.pop();
+        balanceAmount = nextState.balanceAmount;
+        creditDebtAmount = nextState.creditDebtAmount;
+        isBalanceVisible = nextState.isBalanceVisible;
+        updateBalanceDisplay();
+    } else {
+        alert("Không có thao tác nào để làm lại.");
+    }
+}
+
+// Hàm cập nhật số dư và nợ tín dụng lên giao diện
+function updateBalanceDisplay() {
+    document.getElementById('balance').innerText = isBalanceVisible ? balanceAmount.toLocaleString() : '********';
+}
+
 
         function showAccount() {
             const username = document.getElementById('username').value;
             document.getElementById('greeting').innerText = `Xin chào, ${username}`;
             document.getElementById('login').classList.remove('active');
             document.getElementById('account').classList.add('active');
-            document.getElementById('balance').innerText = balanceAmount.toLocaleString() + ' VND';
+            updateBalanceDisplay();
         }
 
         function toggleForms() {
@@ -291,17 +355,18 @@
         }
 
         function toggleBalance() {
+            saveState();
             isBalanceVisible = !isBalanceVisible;
-            document.getElementById('balance').innerText = isBalanceVisible ? balanceAmount.toLocaleString() + ' VND' : '***';
-            document.getElementById('eye-icon').innerText = isBalanceVisible ? 'visibility_off' : 'visibility';
+            updateBalanceDisplay();
         }
+
 
         function openModal(type) {
             const modal = document.getElementById('modal');
             const modalTitle = document.getElementById('modal-title');
             const modalInput = document.getElementById('modal-input');
             const modalDescription = document.getElementById('modal-description');
-
+            
             modal.style.display = 'flex';
             modalInput.value = '';
             modalInput.placeholder = 'Nhập số tiền';
@@ -316,8 +381,8 @@
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
                     break;
                 case 'payDebt':
-                    modalTitle.innerText = 'Thanh toán nợ';
-                    modalDescription.innerText = `Nhập số tiền bạn muốn thanh toán. Số nợ hiện tại: ${creditDebtAmount.toLocaleString()} VND`;
+                    modalTitle.innerText = 'Sao kê';
+                    showTransactionHistory(); // Hiển thị sao kê
                     break;
                 case 'payCredit':
                     modalTitle.innerText = 'Thanh toán tín dụng';
@@ -333,77 +398,176 @@
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
         }
+        // Hàm hiển thị sao kê
+function showTransactionHistory() {
+    const transactionList = document.getElementById('transaction-list');
+    transactionList.innerHTML = '';
 
+    transactionHistory.forEach(transaction => {
+        const listItem = document.createElement('li');
+        listItem.innerText = `${transaction.time}: ${transaction.type} - ${transaction.amount.toLocaleString()} VND`;
+        transactionList.appendChild(listItem);
+    });
+
+    document.getElementById('transaction-history').style.display = 'block';
+}
         function handleTransaction() {
-    const inputAmount = parseFloat(document.getElementById('modal-input').value);
-    if (isNaN(inputAmount) || inputAmount <= 0) {
-        alert('Số tiền không hợp lệ.');
-        return;
-    }
+            const inputAmount = parseFloat(document.getElementById('modal-input').value);
+            if (isNaN(inputAmount) || inputAmount <= 0) {
+                alert('Số tiền không hợp lệ.');
+                return;
+            }
 
-    const modalTitle = document.getElementById('modal-title').innerText;
+            saveState(); // Lưu trạng thái trước khi thực hiện giao dịch
+            const modalTitle = document.getElementById('modal-title').innerText;
 
-    switch (modalTitle) {
+            switch (modalTitle) {
         case 'Rút tiền':
             if (inputAmount > balanceAmount) {
                 alert('Số dư không đủ để rút số tiền này.');
+                return;
             } else {
                 balanceAmount -= inputAmount;
+                transactionType = 'Rút tiền';
                 alert(`Bạn đã rút ${inputAmount.toLocaleString()} VND.`);
-                updateBalanceDisplay();
             }
             break;
 
         case 'Chuyển tiền':
             if (inputAmount > balanceAmount) {
                 alert('Số dư không đủ để chuyển số tiền này.');
+                return;
             } else {
                 balanceAmount -= inputAmount;
+                transactionType = 'Chuyển tiền';
                 alert(`Bạn đã chuyển ${inputAmount.toLocaleString()} VND.`);
-                updateBalanceDisplay();
-            }
-            break;
-
-        case 'Thanh toán nợ':
-            if (inputAmount > creditDebtAmount) {
-                alert('Số tiền thanh toán không thể lớn hơn số nợ hiện tại.');
-            } else {
-                creditDebtAmount -= inputAmount; // Giảm số nợ
-                alert(`Bạn đã thanh toán nợ ${inputAmount.toLocaleString()} VND.`);
             }
             break;
 
         case 'Thanh toán tín dụng':
-            // Logic for credit payment (if applicable)
-            alert(`Bạn đã thanh toán tín dụng ${inputAmount.toLocaleString()} VND.`);
+            if (inputAmount > balanceAmount) {
+                alert('Số dư không đủ để thanh toán tín dụng.');
+                return;
+            } else {
+                balanceAmount -= inputAmount;
+                transactionType = 'Thanh toán tín dụng';
+                alert(`Bạn đã thanh toán tín dụng ${inputAmount.toLocaleString()} VND.`);
+            }
             break;
 
         case 'Nạp tiền':
-            balanceAmount += inputAmount; // Tăng số dư
-            alert(`Bạn đã nạp ${inputAmount.toLocaleString()} VND.`);
-            updateBalanceDisplay();
+            balanceAmount += inputAmount;
+            transactionType = 'Nạp tiền';
+            alert(`Bạn đã nạp ${inputAmount.toLocaleString()} VND vào tài khoản.`);
             break;
+
+        default:
+            alert('Giao dịch không hợp lệ.');
+            return;
     }
 
-    closeModal(); // Đóng modal sau khi hoàn tất giao dịch
+    // Thêm giao dịch vào transactionHistory
+    transactionHistory.push({
+        type: transactionType,
+        amount: inputAmount,
+        time: getFormattedDate()
+    });
+
+    updateBalanceDisplay();
+    closeModal();
+}
+        let invoiceCounter = 1; // Khởi tạo bộ đếm số hóa đơn
+
+function getFormattedDate() {
+    const now = new Date();
+    return `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 }
 
-function updateBalanceDisplay() {
-    document.getElementById('balance').innerText = balanceAmount.toLocaleString() + ' VND';
+function generateInvoice(transactionType, amount, accountNumber = '') {
+    const transactionTime = new Date().toLocaleString();
+    const invoiceNumber = 'HD' + Math.floor(Math.random() * 1000000); // Generate random invoice number
+
+    let invoiceDetails = `Hóa Đơn: ${invoiceNumber}\n`;
+    invoiceDetails += `Loại giao dịch: ${transactionType}\n`;
+    invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
+    invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
+
+    if (transactionType === 'Chuyển tiền' && accountNumber) {
+        invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
+    }
+
+    alert(invoiceDetails); // Display or log the invoice
 }
 
-        function registerUser() {
-            const username = document.getElementById('reg-username').value;
-            const cccd = document.getElementById('reg-cccd').value;
-            const phone = document.getElementById('reg-phone').value;
-            const address = document.getElementById('reg-address').value;
-            const password = document.getElementById('reg-password').value;
+function showInvoice(type, amount) {
+        const invoiceSection = document.getElementById('invoice-section');
+        const invoiceDetails = document.getElementById('invoice-details');
 
-            // Tại đây, bạn sẽ xử lý logic đăng ký, chẳng hạn như gửi dữ liệu đến máy chủ
-            alert(`Đăng ký thành công cho ${username}!`);
-            toggleForms(); // Tự động chuyển đến biểu mẫu đăng nhập sau khi đăng ký
+        invoiceSection.style.display = 'block'; // Hiển thị phần hóa đơn
+        invoiceDetails.innerText = `Loại giao dịch: ${type}\nSố tiền: ${amount.toLocaleString()} VND\nThời gian: ${getFormattedDate()}`;
+    }
+
+
+    function showInvoice(type, amount) {
+        const invoiceSection = document.getElementById('invoice-section');
+        const invoiceDetails = document.getElementById('invoice-details');
+        
+        invoiceSection.style.display = 'block'; // Hiển thị phần hóa đơn
+        invoiceDetails.innerText = `Loại giao dịch: ${type}\nSố tiền: ${amount.toLocaleString()} VND\nThời gian: ${getFormattedDate()}`;
+    
+    function getFormattedDate() {
+        const now = new Date();
+        return `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+    }
+
+    function generateInvoice(transactionType, amount, accountNumber = '') {
+        const transactionTime = new Date().toLocaleString();
+        const invoiceNumber = 'HD' + Math.floor(Math.random() * 1000000); // Generate random invoice number
+
+        let invoiceDetails = `Hóa Đơn: ${invoiceNumber}\n`;
+        invoiceDetails += `Loại giao dịch: ${transactionType}\n`;
+        invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
+        invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
+
+        if (transactionType === 'Chuyển tiền' && accountNumber) {
+            invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
         }
-    </script>
 
+        alert(invoiceDetails); // Display or log the invoice
+    }
+    closeModal();
+}
+function showInvoice(type, amount) {
+        const invoiceSection = document.getElementById('invoice-section');
+        const invoiceDetails = document.getElementById('invoice-details');
+
+        invoiceSection.style.display = 'block'; // Hiển thị phần hóa đơn
+        invoiceDetails.innerText = `Loại giao dịch: ${type}\nSố tiền: ${amount.toLocaleString()} VND\nThời gian: ${getFormattedDate()}`;
+    }
+    
+        function updateBalanceDisplay() {
+            document.getElementById('balance').innerText = isBalanceVisible ? balanceAmount.toLocaleString() : '********';
+        }
+
+       function showTransactionHistory() {
+    let historyContent = "Sao Kê Giao Dịch:\n";
+    transactionHistory.forEach((transaction, index) => {
+        historyContent += `\nGiao dịch #${index + 1}\n`;
+        historyContent += `Loại: ${transaction.type}\n`;
+        historyContent += `Số tiền: ${transaction.amount.toLocaleString()} VND\n`;
+        historyContent += `Thời gian: ${transaction.time}\n`;
+    });
+
+    if (transactionHistory.length === 0) {
+        historyContent += "Không có giao dịch nào được ghi nhận.";
+    }
+
+    alert(historyContent);
+}
+
+
+
+    </script>
 </body>
+
 </html>
