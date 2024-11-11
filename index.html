@@ -693,7 +693,7 @@ function selectBankAccount() {
     // khóa mk
     function promptPassword() {
     for (let i = 0; i < 3; i++) {
-        const inputPassword = prompt("Nhập mật khẩu của bạn:");
+        const inputPassword = prompt("Nhập mã PIN gửi đến điện thoại của bạn:");
         if (verifyPassword(inputPassword)) {
             return true; // Nếu mật khẩu đúng, tiếp tục giao dịch
         } else {
