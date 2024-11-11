@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Princess Bank</title>
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
@@ -198,7 +199,7 @@
             height: 80px;
             border-radius: 50%;
             cursor: pointer;
-            background-image: url('avatar.jpg'); /* Replace with user avatar */
+            background-image: url('vg.jpg'); /* Replace with user avatar */
             background-size: cover;
             border: 2px solid #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -290,18 +291,35 @@
                 </div>
             </div>
 
-            <div class="back-button-container">
-                <button class="back-button" onclick="undoAction()">Undo</button>
-                <button class="redo-button" onclick="redoAction()">Redo</button>
-            </div>
+          
 
             <div class="nav">
-                <button onclick="openModal('withdraw')">Rút tiền</button>
-                <button onclick="openModal('transfer')">Chuyển tiền</button>
-                <button onclick="openModal('payDebt')">Sao kê</button>
-                <button onclick="openModal('payCredit')">Thanh toán tín dụng</button>
-                <button onclick="openModal('precharge')">Nạp tiền</button>
+               
+                <button onclick="openModal('transfer')">
+                    💸 Chuyển tiền
+                </button>
+                <button onclick="openModal('payDebt')">
+                    📜 Sao kê
+                </button>
+                <button onclick="openModal('payCredit')">
+                    💳 Thanh toán tín dụng
+                </button>
+                <button onclick="openModal('precharge')">
+                    💰 Nạp tiền
+                </button>
+                <button onclick="openModal('billPayment')">
+                    🧾 Thanh toán hóa đơn
+                    <div id="dropdown" class="dropdown-menu">
+                        <a href="#">Thông tin cá nhân</a>
+                        <a href="#">Đổi mật khẩu</a>
+                        <a href="#">Đăng xuất</a>
+                    </div>
+                </button>
+                <button onclick="openModal('savings')">
+                    🐷 Tiết kiệm
+                </button>
             </div>
+            
             
         </div>
     </div>
@@ -332,10 +350,7 @@
                 <pre id="invoice-details"></pre>
             </div>
         </div>
-    </div>
-    
-
-    
+    </div>  
     
     <script>
 
@@ -378,42 +393,6 @@
             });
             redoStack = []; // Reset redo stack khi có thao tác mới
         }
-
-// Hàm Undo - quay lại trạng thái trước đó
-function undoAction() {
-    if (stateStack.length > 0) {
-        redoStack.push({
-            balanceAmount: balanceAmount,
-            creditDebtAmount: creditDebtAmount,
-            isBalanceVisible: isBalanceVisible
-        });
-        const lastState = stateStack.pop();
-        balanceAmount = lastState.balanceAmount;
-        creditDebtAmount = lastState.creditDebtAmount;
-        isBalanceVisible = lastState.isBalanceVisible;
-        updateBalanceDisplay();
-    } else {
-        alert("Không có thao tác nào để hoàn tác.");
-    }
-}
-
-// Hàm Redo - lặp lại trạng thái sau khi đã Undo
-function redoAction() {
-    if (redoStack.length > 0) {
-        stateStack.push({
-            balanceAmount: balanceAmount,
-            creditDebtAmount: creditDebtAmount,
-            isBalanceVisible: isBalanceVisible
-        });
-        const nextState = redoStack.pop();
-        balanceAmount = nextState.balanceAmount;
-        creditDebtAmount = nextState.creditDebtAmount;
-        isBalanceVisible = nextState.isBalanceVisible;
-        updateBalanceDisplay();
-    } else {
-        alert("Không có thao tác nào để làm lại.");
-    }
-}
 
 // Hàm cập nhật số dư và nợ tín dụng lên giao diện
 function updateBalanceDisplay() {
@@ -470,10 +449,7 @@ function updateBalanceDisplay() {
             modalInput.placeholder = 'Nhập số tiền';
 
             switch (type) {
-                case 'withdraw':
-                    modalTitle.innerText = 'Rút tiền';
-                    modalDescription.innerText = 'Nhập số tiền bạn muốn rút:';
-                    break;
+               
                 case 'transfer':
                     modalTitle.innerText = 'Chuyển tiền';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
@@ -490,9 +466,15 @@ function updateBalanceDisplay() {
                     modalTitle.innerText = 'Nạp tiền ';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển vào tài khoản:';
                     break;
-                  
-            }
-        }
+                
+                 case 'savings':
+                    modalTitle.innerText = 'Tiết kiệm';
+                    modalDescription.innerText = 'Nhập số tiền bạn muốn gửi tiết kiệm:';
+                    // Assuming there's a function to handle savings
+                    handleSavings(); 
+                    break;  
+                        }
+                    }
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
@@ -530,6 +512,37 @@ function updateBalanceDisplay() {
 
             saveState(); // Lưu trạng thái trước khi thực hiện giao dịch
             const modalTitle = document.getElementById('modal-title').innerText;
+// Thông tin tài khoản tín dụng
+let creditAccount = {
+    accountNumber: '999888777',
+    accountName: 'Tài khoản Tín dụng',
+    balanceAmount: 1000000000, // Số dư ban đầu của tài khoản tín dụng
+    creditLimit: 5000000 // Giới hạn tín dụng
+};
+
+// Danh sách tài khoản ngân hàng
+let bankAccounts = [
+    { accountNumber: '123456789', accountName: 'Ngân hàng A', balance: 5000000000 },
+    { accountNumber: '987654321', accountName: 'Ngân hàng B', balance: 3000000000 },
+    { accountNumber: '112233445', accountName: 'Ngân hàng C', balance: 1000000000 }
+];
+
+// Hàm chọn tài khoản ngân hàng, yêu cầu người dùng nhập đúng số tài khoản
+function selectBankAccount() {
+    let options = bankAccounts.map((acc, index) => `${index + 1}. ${acc.accountName} (${acc.accountNumber})`).join('\n');
+    let validAccounts = bankAccounts.map(acc => acc.accountNumber); // Danh sách các số tài khoản hợp lệ
+
+    // Hiển thị danh sách tài khoản ngân hàng và yêu cầu nhập số tài khoản
+    let choice = prompt(`Chọn tài khoản ngân hàng để nạp vào tài khoản tín dụng:\n${options}\nNhập số tài khoản ngân hàng:`);
+
+    // Kiểm tra nếu người dùng nhập đúng STK
+    if (validAccounts.includes(choice)) {
+        return bankAccounts.find(acc => acc.accountNumber === choice); // Trả về tài khoản ngân hàng khớp với STK nhập vào
+    } else {
+        alert('Số tài khoản không hợp lệ. Giao dịch bị hủy.');
+        return null; // Nếu STK không hợp lệ, hủy giao dịch
+    }
+}
 
             switch (modalTitle) {
         case 'Rút tiền':
@@ -566,11 +579,84 @@ function updateBalanceDisplay() {
             break;
 
         case 'Nạp tiền':
-            balanceAmount += inputAmount;
-            transactionType = 'Nạp tiền';
-            alert(`Bạn đã nạp ${inputAmount.toLocaleString()} VND vào tài khoản.`);
+              // Bước 1: Chọn tài khoản ngân hàng để rút tiền
+            let selectedBankAccount = selectBankAccount();
+            if (!selectedBankAccount) {
+                return; // Hủy giao dịch nếu không chọn tài khoản hợp lệ
+            }
+
+            // Bước 2: Nhập số tiền muốn nạp vào tài khoản tín dụng
+            let amountToDeposit = parseFloat(prompt(`Nhập số tiền bạn muốn nạp vào tài khoản tín dụng từ ${selectedBankAccount.accountName}:`));
+            
+            if (isNaN(amountToDeposit) || amountToDeposit <= 0) {
+                alert('Số tiền không hợp lệ. Giao dịch bị hủy.');
+                return;
+            }
+
+            // Kiểm tra số dư của tài khoản ngân hàng
+            if (amountToDeposit > selectedBankAccount.balance) {
+                alert('Số dư tài khoản ngân hàng không đủ để thực hiện giao dịch.');
+                return;
+            }
+
+            // Bước 3: Cập nhật số dư - trừ từ tài khoản ngân hàng và cộng vào tài khoản tín dụng
+            selectedBankAccount.balance -= amountToDeposit;
+            creditAccount.balance += amountToDeposit;
+
+            alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n` +
+                  `Số dư tài khoản tín dụng hiện tại: ${creditAccount.balance.toLocaleString()} VND\n` +
+                  `Số dư tài khoản ${selectedBankAccount.accountName} còn lại: ${selectedBankAccount.balance.toLocaleString()} VND.`);
             break;
 
+         case 'Thanh toán hóa đơn': // Thêm case cho thanh toán hóa đơn
+        // Hiển thị lựa chọn thanh toán
+        let paymentChoice = prompt("Chọn loại hóa đơn bạn muốn thanh toán:\n1. Tiền nhà\n2. Tiền điện\n3. Tiền nước\n4. Tiền mạng\n5. Tiền điện thoại");
+        
+        if (isNaN(paymentChoice) || paymentChoice < 1 || paymentChoice > 5) {
+            alert('Lựa chọn không hợp lệ.');
+            return;
+        }
+
+        // Nhập số tiền thanh toán
+        let paymentAmount = parseFloat(prompt("Nhập số tiền bạn muốn thanh toán:"));
+        
+        if (isNaN(paymentAmount) || paymentAmount <= 0) {
+            alert('Số tiền không hợp lệ. Giao dịch bị hủy.');
+            return;
+        }
+
+        // Kiểm tra số dư tài khoản trước khi thanh toán
+        if (paymentAmount > balanceAmount) {
+            alert('Số dư không đủ để thanh toán.');
+            return;
+        }
+
+        // Thực hiện thanh toán và cập nhật số dư
+        balanceAmount -= paymentAmount;
+        let billType = '';
+
+        switch (paymentChoice) {
+            case '1':
+                billType = 'Tiền nhà';
+                break;
+            case '2':
+                billType = 'Tiền điện';
+                break;
+            case '3':
+                billType = 'Tiền nước';
+                break;
+            case '4':
+                billType = 'Tiền mạng';
+                break;
+            case '5':
+                billType = 'Tiền điện thoại';
+                break;
+        }
+
+        transactionType = `Thanh toán ${billType}`;
+        alert(`Bạn đã thanh toán ${billType} ${paymentAmount.toLocaleString()} VND.\n` +
+              `Số dư hiện tại: ${balanceAmount.toLocaleString()} VND.`);
+        break;
         default:
             alert('Giao dịch không hợp lệ.');
             return;
@@ -587,6 +673,23 @@ function updateBalanceDisplay() {
         updateBalanceDisplay();
         closeModal();
         }
+    // Update generateInvoice to include bank name if provided
+    function generateInvoice(transactionType, amount, accountNumber = '', bankName = '') {
+        const transactionTime = new Date().toLocaleString();
+        const invoiceNumber = 'HD' + Math.floor(Math.random() * 1000000);
+
+        let invoiceDetails = `Hóa Đơn: ${invoiceNumber}\n`;
+        invoiceDetails += `Loại giao dịch: ${transactionType}\n`;
+        invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
+        invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
+
+        if (transactionType === 'Chuyển tiền' && accountNumber) {
+            invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
+            invoiceDetails += `Ngân hàng nhận: ${bankName}\n`;
+        }
+
+        alert(invoiceDetails); // Display the invoice
+    }    
     // khóa mk
     function promptPassword() {
     for (let i = 0; i < 3; i++) {
@@ -627,15 +730,6 @@ function generateInvoice(transactionType, amount) {
     // Hiển thị hóa đơn
     alert(invoiceDetails); // Hiển thị hóa đơn qua alert
 }
-
-
-function showInvoice(type, amount) {
-        const invoiceSection = document.getElementById('invoice-section');
-        const invoiceDetails = document.getElementById('invoice-details');
-
-        invoiceSection.style.display = 'block'; // Hiển thị phần hóa đơn
-        invoiceDetails.innerText = `Loại giao dịch: ${type}\nSố tiền: ${amount.toLocaleString()} VND\nThời gian: ${getFormattedDate()}`;
-    }
 
 
     function showInvoice(type, amount) {
