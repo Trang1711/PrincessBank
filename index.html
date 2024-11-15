@@ -499,7 +499,7 @@ function updateBalanceDisplay() {
 
             function handleTransaction() {
                     if (!promptPassword()) {
-                alert("Giao dịch bị hủy do nhập sai mật khẩu quá 3 lần.");
+                alert("Giao dịch bị hủy do nhập sai mã PIN 3 lần.");
                 return; // Hủy giao dịch nếu sai mật khẩu 3 lần
             }
 
@@ -697,7 +697,7 @@ function selectBankAccount() {
         if (verifyPassword(inputPassword)) {
             return true; // Nếu mật khẩu đúng, tiếp tục giao dịch
         } else {
-            alert("Mật khẩu không chính xác.");
+            alert("Mã PIN không chính xác.");
             failedAttempts++;
             if (failedAttempts >= 3) {
                 return false; // Nếu sai 3 lần, hủy giao dịch
