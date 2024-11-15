@@ -601,9 +601,9 @@ function selectBankAccount() {
                 return;
             }
 
-            // Bước 3: Cập nhật số dư - trừ từ tài khoản ngân hàng và cộng vào tài khoản tín dụng
-            selectedBankAccount.balance -= amountToDeposit;
-            creditAccount.balance += amountToDeposit;
+            // Bước 3: Cập nhật số dư cộng vào tài khoản tín dụng
+            balanceAmount += inputAmount;
+                transactionType = 'Nạp tiền';
             // Hiển thị hóa đơn cho giao dịch
             showInvoice('Nạp tiền', amountToDeposit);
             alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
