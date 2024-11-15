@@ -603,8 +603,32 @@ function selectBankAccount() {
             // Bước 3: Cập nhật số dư - trừ từ tài khoản ngân hàng và cộng vào tài khoản tín dụng
             selectedBankAccount.balance -= amountToDeposit;
             creditAccount.balance += amountToDeposit;
-
+            // Hiển thị hóa đơn cho giao dịch
+            showInvoice('Nạp tiền', amountToDeposit);
             alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
+
+              // Bước 4: Tạo hóa đơn
+    let receipt = `
+        HÓA ĐƠN NẠP TIỀN
+        -------------------------
+        Ngày giao dịch: ${new Date().toLocaleDateString()}
+        Giờ giao dịch: ${new Date().toLocaleTimeString()}
+        
+        Tài khoản ngân hàng nguồn: ${selectedBankAccount.accountName}
+        Số tài khoản: 098754060400
+        
+        Tài khoản tín dụng đích: ${creditAccount.accountName}
+        Số tài khoản: 008305000158
+
+        Số tiền đã nạp: ${amountToDeposit.toLocaleString()} VND
+
+        
+        -------------------------
+        Cảm ơn bạn đã sử dụng dịch vụ!
+    `;
+
+    // Hiển thị hóa đơn
+    alert(receipt);
             break;
 
          case 'Thanh toán hóa đơn': // Thêm case cho thanh toán hóa đơn
@@ -672,6 +696,35 @@ function selectBankAccount() {
         updateBalanceDisplay();
         closeModal();
         }
+// Hàm cập nhật giao dịch vào sao kê
+function addTransactionToHistory(type, amount, accountNumber = '', bankName = '') {
+    transactionHistory.push({
+        type: type,
+        amount: amount,
+        time: getFormattedDate(),
+        accountNumber: accountNumber,
+        bankName: bankName
+    });
+    
+    updateTransactionHistoryDisplay(); // Cập nhật sao kê
+    generateInvoice(type, amount, accountNumber, bankName); // Hiển thị hóa đơn
+}
+    // Hàm hiển thị sao kê giao dịch
+function updateTransactionHistoryDisplay() {
+    const transactionList = document.getElementById('transaction-list');
+    transactionList.innerHTML = ''; // Xóa danh sách cũ
+
+    transactionHistory.forEach(transaction => {
+        const listItem = document.createElement('li');
+        listItem.innerText = `${transaction.time}: ${transaction.type} - ${transaction.amount.toLocaleString()} VND`;
+        if (transaction.accountNumber) {
+            listItem.innerText += ` - Tài khoản: ${transaction.accountNumber} (${transaction.bankName})`;
+        }
+        transactionList.appendChild(listItem);
+    });
+
+    document.getElementById('transaction-history').style.display = 'block';
+}    
     // Update generateInvoice to include bank name if provided
     function generateInvoice(transactionType, amount, accountNumber = '', bankName = '') {
         const transactionTime = new Date().toLocaleString();
