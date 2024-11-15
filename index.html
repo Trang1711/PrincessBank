@@ -297,7 +297,7 @@
             <div class="nav">
                
                 <button onclick="openModal('transfer')">
-                    💸  Lãi suất
+                    💸 Chuyển tiền
                 </button>
                 <button onclick="openModal('payDebt')">
                     📜 Sao kê
@@ -452,7 +452,7 @@ function updateBalanceDisplay() {
             switch (type) {
                
                 case 'transfer':
-                    modalTitle.innerText = 'Lãi suất';
+                    modalTitle.innerText = 'Chuyển tiền';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
                     break;
                 case 'payDebt':
@@ -557,13 +557,13 @@ function selectBankAccount() {
             }
             break;
 
-        case 'Lãi suất':
+        case 'Chuyển tiền':
             if (inputAmount > balanceAmount) {
                 alert('Số dư không đủ để chuyển số tiền này.');
                 return;
             } else {
                 balanceAmount -= inputAmount;
-                transactionType = 'Lãi suất';
+                transactionType = 'Chuyển tiền';
                 alert(`Bạn đã chuyển ${inputAmount.toLocaleString()} VND.`);
             }
             break;
@@ -576,6 +576,8 @@ function selectBankAccount() {
                 balanceAmount -= inputAmount;
                 transactionType = 'Thanh toán tín dụng';
                 alert(`Bạn đã thanh toán tín dụng ${inputAmount.toLocaleString()} VND.`);
+                alert('Số nợ tín dụng hiện tại là 0. ');
+                alert('Bạn đã hoàn tất thanh toán ');
             }
             break;
 
@@ -627,9 +629,17 @@ function selectBankAccount() {
         Cảm ơn bạn đã sử dụng dịch vụ!
     `;
 
-    // Hiển thị hóa đơn
-    alert(receipt);
-            break;
+            // Hiển thị hóa đơn
+            alert(receipt);
+
+        // Thêm giao dịch vào sao kê
+        addTransactionToHistory('Nạp tiền', amountToDeposit, selectedBankAccount.accountNumber, selectedBankAccount.bankName);
+
+        // Hiển thị sao kê sau khi giao dịch
+        updateTransactionHistoryDisplay();
+
+        alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
+        break;
 
          case 'Thanh toán hóa đơn': // Thêm case cho thanh toán hóa đơn
         // Hiển thị lựa chọn thanh toán
@@ -697,19 +707,21 @@ function selectBankAccount() {
         closeModal();
         }
 // Hàm cập nhật giao dịch vào sao kê
-function addTransactionToHistory(type, amount, accountNumber = '', bankName = '') {
+function addTransactionToHistory(transactionType, amount, accountNumber = '', bankName = '') {
+    // Thêm giao dịch vào danh sách
     transactionHistory.push({
-        type: type,
+        type: transactionType,
         amount: amount,
         time: getFormattedDate(),
         accountNumber: accountNumber,
         bankName: bankName
     });
-    
-    updateTransactionHistoryDisplay(); // Cập nhật sao kê
-    generateInvoice(type, amount, accountNumber, bankName); // Hiển thị hóa đơn
+
+    // Cập nhật hiển thị sao kê
+    updateTransactionHistoryDisplay();
 }
-    // Hàm hiển thị sao kê giao dịch
+
+// Hàm hiển thị sao kê giao dịch
 function updateTransactionHistoryDisplay() {
     const transactionList = document.getElementById('transaction-list');
     transactionList.innerHTML = ''; // Xóa danh sách cũ
@@ -724,7 +736,8 @@ function updateTransactionHistoryDisplay() {
     });
 
     document.getElementById('transaction-history').style.display = 'block';
-}    
+}
+ 
     // Update generateInvoice to include bank name if provided
     function generateInvoice(transactionType, amount, accountNumber = '', bankName = '') {
         const transactionTime = new Date().toLocaleString();
@@ -735,7 +748,7 @@ function updateTransactionHistoryDisplay() {
         invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
         invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
 
-        if (transactionType === 'Lãi suất' && accountNumber) {
+        if (transactionType === 'Chuyển tiền' && accountNumber) {
             invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
             invoiceDetails += `Ngân hàng nhận: ${bankName}\n`;
         }
@@ -805,7 +818,7 @@ function generateInvoice(transactionType, amount) {
         invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
         invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
 
-        if (transactionType === 'Lãi suất' && accountNumber) {
+        if (transactionType === 'Chuyển tiền' && accountNumber) {
             invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
         }
 
