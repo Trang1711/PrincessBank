@@ -296,7 +296,7 @@
             <div class="nav">
                
                 <button onclick="openModal('transfer')">
-                    💸 Chuyển tiền
+                    💸  Lãi suất
                 </button>
                 <button onclick="openModal('payDebt')">
                     📜 Sao kê
@@ -451,7 +451,7 @@ function updateBalanceDisplay() {
             switch (type) {
                
                 case 'transfer':
-                    modalTitle.innerText = 'Chuyển tiền';
+                    modalTitle.innerText = 'Lãi suất';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
                     break;
                 case 'payDebt':
@@ -556,13 +556,13 @@ function selectBankAccount() {
             }
             break;
 
-        case 'Chuyển tiền':
+        case 'Lãi suất':
             if (inputAmount > balanceAmount) {
                 alert('Số dư không đủ để chuyển số tiền này.');
                 return;
             } else {
                 balanceAmount -= inputAmount;
-                transactionType = 'Chuyển tiền';
+                transactionType = 'Lãi suất';
                 alert(`Bạn đã chuyển ${inputAmount.toLocaleString()} VND.`);
             }
             break;
@@ -603,9 +603,7 @@ function selectBankAccount() {
             selectedBankAccount.balance -= amountToDeposit;
             creditAccount.balance += amountToDeposit;
 
-            alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n` +
-                 
-                  `Số dư tài khoản ${selectedBankAccount.accountName} còn lại: ${selectedBankAccount.balance.toLocaleString()} VND.`);
+            alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
             break;
 
          case 'Thanh toán hóa đơn': // Thêm case cho thanh toán hóa đơn
@@ -683,7 +681,7 @@ function selectBankAccount() {
         invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
         invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
 
-        if (transactionType === 'Chuyển tiền' && accountNumber) {
+        if (transactionType === 'Lãi suất' && accountNumber) {
             invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
             invoiceDetails += `Ngân hàng nhận: ${bankName}\n`;
         }
@@ -753,7 +751,7 @@ function generateInvoice(transactionType, amount) {
         invoiceDetails += `Số tiền: ${amount.toLocaleString()} VND\n`;
         invoiceDetails += `Thời gian giao dịch: ${transactionTime}\n`;
 
-        if (transactionType === 'Chuyển tiền' && accountNumber) {
+        if (transactionType === 'Lãi suất' && accountNumber) {
             invoiceDetails += `Số tài khoản nhận: ${accountNumber}\n`;
         }
 
