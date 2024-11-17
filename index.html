@@ -241,31 +241,18 @@
 
     <div class="container">
         <h1>Princess Bank</h1>
+ <div id="login" class="form-section active">
+        <h2>Đăng Nhập</h2>
+        <form onsubmit="event.preventDefault(); showAccount();">
+            <input type="text" id="username" placeholder="Tên đăng nhập hoặc số điện thoại" required>
+            <input type="password" id="password" placeholder="Mật khẩu" required>
+            <button type="submit">Đăng Nhập</button>
+            <p><a href="#" onclick="toggleForms()">Quên mật khẩu</a></p>
+        </form>
+    </div>
+   
 
-        <!-- Phần Đăng Ký -->
-        <div id="register" class="form-section active">
-            <h2>Đăng Ký</h2>
-            <form onsubmit="event.preventDefault(); registerUser();">
-                <input type="text" id="reg-username" placeholder="Tên đăng nhập" required>
-                <input type="text" id="reg-cccd" placeholder="CCCD" required>
-                <input type="text" id="reg-phone" placeholder="Số điện thoại" required>
-                <input type="text" id="reg-address" placeholder="Địa chỉ" required>
-                <input type="password" id="reg-password" placeholder="Mật khẩu" required>
-                <button type="submit">Đăng Ký</button>
-                <p>Đã có tài khoản? <a href="#" onclick="toggleForms()">Đăng Nhập</a></p>
-            </form>
-        </div>
 
-        <!-- Phần Đăng Nhập -->
-        <div id="login" class="form-section">
-            <h2>Đăng Nhập</h2>
-            <form onsubmit="event.preventDefault(); showAccount();">
-                <input type="text" id="username" placeholder="Tên đăng nhập hoặc số điện thoại" required>
-                <input type="password" id="password" placeholder="Mật khẩu" required>
-                <button type="submit">Đăng Nhập</button>
-                <p><a href="#" onclick="toggleForms()">Quên mật khẩu</a></p>
-            </form>
-        </div>
 
         <!-- Phần Tài Khoản -->
         <div id="account" class="form-section">
@@ -297,7 +284,7 @@
             <div class="nav">
                
                 <button onclick="openModal('transfer')">
-                    💸 Chuyển tiền
+                    💸 Thanh toán tín dụng cho người khác
                 </button>
                 <button onclick="openModal('payDebt')">
                     📜 Sao kê
@@ -306,18 +293,14 @@
                     💳 Thanh toán tín dụng
                 </button>
                 <button onclick="openModal('precharge')">
-                    💰 Nạp tiền
+                    💰 Chuyển tiền 
                 </button>
                 <button onclick="openModal('billPayment')">
                     🧾 Thanh toán hóa đơn
-                    <div id="dropdown" class="dropdown-menu">
-                        <a href="#">Thông tin cá nhân</a>
-                        <a href="#">Đổi mật khẩu</a>
-                        <a href="#">Đăng xuất</a>
-                    </div>
+                    
                 </button>
                 <button onclick="openModal('savings')">
-                    🐷 Tiết kiệm
+                    🐷 Lãi suất
                 </button>
             </div>
             
@@ -452,8 +435,23 @@ function updateBalanceDisplay() {
             switch (type) {
                
                 case 'transfer':
-                    modalTitle.innerText = 'Chuyển tiền';
-                    modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển:';
+                modalTitle.innerText = 'Thanh toán tín dụng cho người khác';
+    modalDescription.innerHTML = `
+      
+        <br />
+        <label for="accountNumber">Nhập số tài khoản người nhận:</label>
+        <input type="text" id="accountNumber" placeholder="Số tài khoản" />
+        <br />
+        <label for="bankName">Chọn tên ngân hàng:</label>
+        <select id="bankName">
+            <option value="" disabled selected>Chọn ngân hàng</option>
+            <option value="Vietcombank">Vietcombank</option>
+            <option value="Techcombank">Techcombank</option>
+            <option value="Techcombank">MBBank</option>
+            <option value="ACB">ACB</option>
+            <!-- Thêm các ngân hàng khác từ danh sách gần đây -->
+        </select>
+    `;
                     break;
                 case 'payDebt':
                     modalTitle.innerText = 'Sao kê';
@@ -464,10 +462,36 @@ function updateBalanceDisplay() {
                     modalDescription.innerText = 'Bạn đang nợ tín dụng 20.000.000 VNĐ';
                     break;
                 case 'precharge':   
-                    modalTitle.innerText = 'Nạp tiền ';
+                    modalTitle.innerText = 'Chuyển tiền ';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn chuyển vào tài khoản:';
                     break;
-                
+                 case 'billPayment':
+    modalTitle.innerText = 'Thanh toán hóa đơn';
+    modalDescription.innerHTML = `
+        
+        <label for="billType">Chọn loại hóa đơn:</label>
+        <select id="billType">
+            <option value="" disabled selected>Chọn hóa đơn</option>
+            <option value="house">Tiền nhà</option>
+            <option value="electricity">Tiền điện</option>
+            <option value="water">Tiền nước</option>
+            <option value="internet">Tiền mạng</option>
+            <option value="phone">Tiền điện thoại</option>
+        </select>
+        <br />
+        <label for="billAmount">Số tiền:500000</label>
+        <br />
+        <label for="bankName">Chọn tên ngân hàng:</label>
+        <select id="bankName">
+            <option value="" disabled selected>Chọn ngân hàng</option>
+            <option value="Vietcombank">Vietcombank</option>
+            <option value="Techcombank">Techcombank</option>
+            <option value="MBBank">MBBank</option>
+            <option value="ACB">ACB</option>
+        </select>
+    `;
+    break;
+   
                  case 'savings':
                     modalTitle.innerText = 'Tiết kiệm';
                     modalDescription.innerText = 'Nhập số tiền bạn muốn gửi tiết kiệm:';
@@ -557,13 +581,13 @@ function selectBankAccount() {
             }
             break;
 
-        case 'Chuyển tiền':
+        case 'Thanh toán tín dụng cho người khác':
             if (inputAmount > balanceAmount) {
                 alert('Số dư không đủ để chuyển số tiền này.');
                 return;
             } else {
                 balanceAmount -= inputAmount;
-                transactionType = 'Chuyển tiền';
+                transactionType = 'Thanh toán tín dụng cho người khác';
                 alert(`Bạn đã chuyển ${inputAmount.toLocaleString()} VND.`);
             }
             break;
@@ -579,8 +603,8 @@ function selectBankAccount() {
                 alert('Số nợ tín dụng hiện tại là 0 VNĐ. ');
             }
             break;
-
-        case 'Nạp tiền':
+            
+        case 'Chuyển tiền':
               // Bước 1: Chọn tài khoản ngân hàng để rút tiền
             let selectedBankAccount = selectBankAccount();
             if (!selectedBankAccount) {
@@ -603,14 +627,14 @@ function selectBankAccount() {
 
             // Bước 3: Cập nhật số dư cộng vào tài khoản tín dụng
             balanceAmount += inputAmount;
-                transactionType = 'Nạp tiền';
+                transactionType = 'Chuyển tiền';
             // Hiển thị hóa đơn cho giao dịch
-            showInvoice('Nạp tiền', amountToDeposit);
+            showInvoice('Chuyển tiền', amountToDeposit);
             alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
 
               // Bước 4: Tạo hóa đơn
     let receipt = `
-        HÓA ĐƠN NẠP TIỀN
+        HÓA ĐƠN CHUYỂN TIỀN
         -------------------------
         Ngày giao dịch: ${new Date().toLocaleDateString()}
         Giờ giao dịch: ${new Date().toLocaleTimeString()}
@@ -632,7 +656,7 @@ function selectBankAccount() {
             alert(receipt);
 
         // Thêm giao dịch vào sao kê
-        addTransactionToHistory('Nạp tiền', amountToDeposit, selectedBankAccount.accountNumber, selectedBankAccount.bankName);
+        addTransactionToHistory('Chuyển tiền', amountToDeposit, selectedBankAccount.accountNumber, selectedBankAccount.bankName);
 
         // Hiển thị sao kê sau khi giao dịch
         updateTransactionHistoryDisplay();
@@ -640,55 +664,17 @@ function selectBankAccount() {
         alert(`Bạn đã nạp ${amountToDeposit.toLocaleString()} VND từ tài khoản ${selectedBankAccount.accountName} vào tài khoản tín dụng.\n`);
         break;
 
-         case 'Thanh toán hóa đơn': // Thêm case cho thanh toán hóa đơn
-        // Hiển thị lựa chọn thanh toán
-        let paymentChoice = prompt("Chọn loại hóa đơn bạn muốn thanh toán:\n1. Tiền nhà\n2. Tiền điện\n3. Tiền nước\n4. Tiền mạng\n5. Tiền điện thoại");
-        
-        if (isNaN(paymentChoice) || paymentChoice < 1 || paymentChoice > 5) {
-            alert('Lựa chọn không hợp lệ.');
-            return;
-        }
+        case 'Thanh toán hóa đơn':
+            if (inputAmount > balanceAmount) {
+                alert('Số dư không đủ để chuyển số tiền này.');
+                return;
+            } else {
+                balanceAmount -= inputAmount;
+                transactionType = 'Thanh toán hóa đơn';
+                alert(`Bạn đã thanh toán ${inputAmount.toLocaleString()} VND.`);
+            }
+            break;
 
-        // Nhập số tiền thanh toán
-        let paymentAmount = parseFloat(prompt("Nhập số tiền bạn muốn thanh toán:"));
-        
-        if (isNaN(paymentAmount) || paymentAmount <= 0) {
-            alert('Số tiền không hợp lệ. Giao dịch bị hủy.');
-            return;
-        }
-
-        // Kiểm tra số dư tài khoản trước khi thanh toán
-        if (paymentAmount > balanceAmount) {
-            alert('Số dư không đủ để thanh toán.');
-            return;
-        }
-
-        // Thực hiện thanh toán và cập nhật số dư
-        balanceAmount -= paymentAmount;
-        let billType = '';
-
-        switch (paymentChoice) {
-            case '1':
-                billType = 'Tiền nhà';
-                break;
-            case '2':
-                billType = 'Tiền điện';
-                break;
-            case '3':
-                billType = 'Tiền nước';
-                break;
-            case '4':
-                billType = 'Tiền mạng';
-                break;
-            case '5':
-                billType = 'Tiền điện thoại';
-                break;
-        }
-
-        transactionType = `Thanh toán ${billType}`;
-        alert(`Bạn đã thanh toán ${billType} ${paymentAmount.toLocaleString()} VND.\n` +
-              `Số dư hiện tại: ${balanceAmount.toLocaleString()} VND.`);
-        break;
         default:
             alert('Giao dịch không hợp lệ.');
             return;
