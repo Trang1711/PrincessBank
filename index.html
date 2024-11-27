@@ -299,7 +299,7 @@
                     🧾 Thanh toán hóa đơn
                     
                 </button>
-                <button onclick="openModal('savings')">
+                <button onclick="openModal('care')">
                     🎧 Chăm sóc khách hàng
                 </button>
             </div>
@@ -495,12 +495,25 @@ function updateBalanceDisplay() {
     `;
     break;
    
-                 case 'savings':
-                    modalTitle.innerText = 'Tiết kiệm';
-                    modalDescription.innerText = 'Nhập số tiền bạn muốn gửi tiết kiệm:';
-                    // Assuming there's a function to handle savings
-                    handleSavings(); 
-                    break;  
+    case 'care':
+    modalTitle.innerText = 'Chăm sóc khách hàng';
+    modalInput.placeholder = '   ';
+    modalDescription.innerHTML = `
+         <label for="billType">Liên hệ hỗ trợ:</label>
+        <select id="billType">
+            <option value="" disabled selected>Ưu đãi</option>
+            <option value="house">Lỗi ứng dụng</option>
+            <option value="electricity">Cập nhật thông tin</option>
+            <option value="internet">Dịch vụ tài chính</option>
+        </select>
+    `;
+
+    // Xử lý sự kiện cho các nút
+    document.getElementById('savingsButton').onclick = handleSavings;
+    document.getElementById('accountInfoButton').onclick = showAccountInfo;
+    document.getElementById('supportButton').onclick = contactSupport;
+    break;
+ 
                         }
                     }
 
